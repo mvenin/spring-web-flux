@@ -1,0 +1,43 @@
+
+<div>
+	<button id="subscribe-button">Start tick</button>
+	<button id="close-subscribe-button">Stop tick</button>
+	<ul id="display"></ul>
+</div>
+
+<script>
+	var sse = {};
+	var stringEvents={};
+
+	function registerEventSourceAndAddResponseTo(elementId) {
+		stringEvents = document.getElementById(elementId);
+		sse = new EventSource("qt");
+
+		sse.onmessage = function(e) {
+			var newElement = document.createElement("li");
+			newElement.innerHTML = e.data;
+			stringEvents.appendChild(newElement);
+		}
+
+	}
+
+	addEvent("click", document.getElementById('subscribe-button'), function() {
+		registerEventSourceAndAddResponseTo("display");
+	});
+
+	function addEvent(evnt, elem, func) {
+		if (typeof (EventSource) !== "undefined") {
+			elem.addEventListener(evnt, func, false);
+		} else { // No much to do
+			elem[evnt] = func;
+		}
+	}
+	
+	addEvent("click", document.getElementById('close-subscribe-button'), function() {
+		sse.close();
+		var newElement = document.createElement("li");
+		newElement.innerHTML = "Stream closed";
+		stringEvents.appendChild(newElement);
+	});
+	
+</script>
