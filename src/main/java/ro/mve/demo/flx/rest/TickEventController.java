@@ -11,10 +11,14 @@ import reactor.core.publisher.Flux;
 @RestController
 public class TickEventController {
 	
-	
 	@GetMapping("/tick")
 	Flux<String> tick() {
-		  return Flux.interval(Duration.ofSeconds(1)).map(x -> new Date() + " : -) "  ).log();
+		  return Flux.interval(Duration.ofSeconds(1)).map(x -> new Date() + " : -) "  )
+				  .take(10)
+				  .log()
+				  ;
 	}
 
 }
+
+

@@ -1,0 +1,24 @@
+server:
+  use-forward-headers: true
+  port: 8080
+
+spring:
+    application:
+        name: demo-flux-local
+        
+    devtools:
+        restart:
+            enabled: true
+        livereload:
+            enabled: true
+ 
+    
+    data: 
+      mongodb:
+#        database: heroku_srtb1swc
+#        uri: ${env.MONGODB_URI}    
+        database: micro20
+        uri: mongodb://admin:INdTuIKU3rPc@127.0.0.1:27017/ 
+
+ 
+    

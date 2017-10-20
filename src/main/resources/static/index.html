@@ -11,7 +11,7 @@
 
 	function registerEventSourceAndAddResponseTo(elementId) {
 		stringEvents = document.getElementById(elementId);
-		sse = new EventSource("qt");
+		sse = new EventSource("/tick");
 
 		sse.onmessage = function(e) {
 			var newElement = document.createElement("li");
