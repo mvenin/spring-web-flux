@@ -1,6 +1,9 @@
-show dbs
-db.runCommand( { convertToCapped: 'person', size: 8192 } )
-db.person.stats()
+# Help
+-  show dbs
+-  db.runCommand( { convertToCapped: 'person', size: 8192 } )
+-  db.person.stats()
  
-db.person.insert( { firstname : "Ada", lastname : "Milea", "age" : 25} )
+# Example insert 
+- db.person.insert( { firstname : "Ada", lastname : "Milea", "age" : 25} )
+
 
