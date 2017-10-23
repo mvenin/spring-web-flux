@@ -13,12 +13,12 @@ spring:
             enabled: true
  
     
-    data: 
-      mongodb:
+#    data: 
+#      mongodb:
 #        database: heroku_srtb1swc
 #        uri: ${env.MONGODB_URI}    
-        database: micro20
-        uri: mongodb://admin:INdTuIKU3rPc@127.0.0.1:27017/ 
+#        database: micro20
+#        uri: mongodb://admin:INdTuIKU3rPc@127.0.0.1:27017/ 
 
  
     

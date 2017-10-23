@@ -15,10 +15,7 @@ public class Person {
 	private final String lastname;
 	private final int age;
 	
-	public Person(String name) {
-		this.firstname=name;
-		this.lastname=name;
-		this.age= 30;
-	}
+
+	
 }
 

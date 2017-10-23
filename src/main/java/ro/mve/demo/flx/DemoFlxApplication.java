@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,14 +19,17 @@ import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguratio
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.LoggingEventListener;
+import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+import com.mongodb.reactivestreams.client.MongoCollection;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import ro.mve.demo.flx.mongo.Person;
 import ro.mve.demo.flx.mongo.ReactivePersonRepository;
@@ -44,27 +48,32 @@ import ro.mve.demo.flx.mongo.ReactivePersonRepository;
 @EnableTransactionManagement
 public class DemoFlxApplication extends AbstractReactiveMongoConfiguration implements CommandLineRunner {
 
-	private final Environment environment;
+	@Autowired
+	private Environment environment;
 	
-	@Autowired ReactivePersonRepository repository;
-	@Autowired ReactiveMongoTemplate template;
+	@Autowired 
+	private ReactivePersonRepository repository;
+	
+	@Autowired 
+	private ReactiveMongoTemplate template;
 
 	@Override
 	public void run(String... args) throws Exception {
 
-		template.createCollection(Person.class, new CollectionOptions(10000L, 10000L, true));
+		//Mono<MongoCollection<Document>> collection = template.createCollection(Person.class, CollectionOptions.empty().size(10_000L).maxDocuments(10_000L).collation(Collation.simple()).capped());
+		//collection.subscribeOn(reactor.core.scheduler.Schedulers.elastic());
 
 		String[] names = { "Eddard", "Catelyn", "Jon", "Rob", "Sansa", "Aria", "Bran", "Rickon" };
 
 		Random ramdom = new Random();
-		Flux<Person> starks = Flux.fromStream(Stream.generate(() -> names[ramdom.nextInt(names.length)]).map(Person::new));
+		Flux<Person> starks = Flux.empty();// Flux.fromStream(Stream.generate(() -> names[ramdom.nextInt(names.length)]).map(Person::new));
 
-		Flux.interval(Duration.ofSeconds(1)) //
+		Flux.interval(Duration.ofSeconds(2)) //
 				.zipWith(starks) //
 				.map(Tuple2::getT2) //
 				.flatMap(repository::save) //
 				.doOnNext(System.out::println) //
-				//.subscribe()
+//				.subscribe()
 				;
 
 		System.out.println("Winter is Coming!");
@@ -79,8 +88,10 @@ public class DemoFlxApplication extends AbstractReactiveMongoConfiguration imple
 		return new LoggingEventListener();
 	}
 
-	@Bean
-	//@DependsOn("embeddedMongoServer")
+	public MongoClient reactiveMongoClient() {
+		return MongoClients.create(String.format("mongodb://localhost:%d", 27017));
+	}
+	@Override
 	public MongoClient mongoClient() {
 		return MongoClients.create(String.format("mongodb://localhost:%d", 27017));
 	}
@@ -89,4 +100,6 @@ public class DemoFlxApplication extends AbstractReactiveMongoConfiguration imple
 	protected String getDatabaseName() {
 		return "micro20";
 	}
+
+
 }

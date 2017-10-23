@@ -22,12 +22,16 @@ public class PersonController {
 	Flux<Person> mongoAdd() {
 		return Flux.defer(()-> Flux.from(mongo.save(new Person("Marian", "Venin", 40))) )
 				.subscribeOn(Schedulers.elastic());
-		//return mongo.save(new Person("Marian", "Venin", 40));
 	}
 
-	@GetMapping(value = "/all", produces = MediaType.TEXT_EVENT_STREAM_VALUE)  
+	@GetMapping(value = "/all")  
+	Flux<Person> allPersons() {
+		return mongoAdd().mergeWith(mongo.findAll());
+	}
+	
+	@GetMapping(value = "/tail", produces = MediaType.TEXT_EVENT_STREAM_VALUE)  
 	Flux<Person> streamPersons() {
-		return mongo.findWithTailableCursorBy().share();
+		return mongoAdd().mergeWith(mongo.findWithTailableCursorBy().share());
 	}
 
 }
